@@ -25,7 +25,7 @@ from sklearn.metrics import mean_absolute_error
 
 
 # 銘柄コード一覧
-code_list = pd.read_csv(r'./code_j.csv',encoding='shift_jis')
+code_list = pd.read_csv(r'./code.csv',encoding='shift_jis')
 # 祝日など
 holiday = jpholiday.year_holidays(2022)
 holidays = []
