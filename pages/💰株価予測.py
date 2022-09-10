@@ -22,9 +22,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
 
-from matplotlib import rcParams
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
+import japanize_matplotlib
 
 # 銘柄コード一覧
 code_list = pd.read_csv(r'./code.csv',encoding='shift_jis')
@@ -283,7 +281,7 @@ else:
                 fig, ax = plt.subplots()
 
                 ax.plot(test_result['Date'],test_result['Close'])
-                ax.set_title(code_name, fontname="MS Gothic")
+                ax.set_title(code_name)
 
                 st.pyplot(fig)
 
