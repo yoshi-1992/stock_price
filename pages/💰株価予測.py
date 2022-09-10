@@ -22,7 +22,9 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
 
-
+from matplotlib import rcParams
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Hiragino Maru Gothic Pro', 'Yu Gothic', 'Meirio', 'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP']
 
 # 銘柄コード一覧
 code_list = pd.read_csv(r'./code.csv',encoding='shift_jis')
