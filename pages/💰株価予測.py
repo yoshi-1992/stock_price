@@ -158,6 +158,8 @@ else:
 
             batch_size = len(test) // 50
 
+            
+
             train_loader = DataLoader(train_dataset, batch_size, shuffle=True, drop_last=True)
             val_loader = DataLoader(val_dataset, batch_size)
             test_loader = DataLoader(test_dataset,batch_size)
@@ -200,7 +202,7 @@ else:
                     return loss
 
                 def configure_optimizers(self):
-                    optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
+                    optimizer = torch.optim.Adam(self.parameters(), lr=0.005)
                     return optimizer
 
             # 再現性を確保するためシードを固定する
