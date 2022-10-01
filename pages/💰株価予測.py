@@ -223,7 +223,7 @@ else:
             early_stopping = EarlyStopping(
                 monitor = 'val_loss',
                 mode = 'min',
-                patience = 5
+                patience = 10
             )
 
             device = torch.device('cpu')
@@ -234,7 +234,7 @@ else:
 
             state_dict = torch.load(checkpoint_callback.best_model_path)
 
-            trainer.test(dataloaders=test_loader,ckpt_path=checkpoint_callback.best_model_path)
+            mse = trainer.test(dataloaders=test_loader,ckpt_path=checkpoint_callback.best_model_path)
 
             torch.save(net.state_dict(), 'stock.pt')
             net.load_state_dict(torch.load('stock.pt'))
@@ -245,12 +245,27 @@ else:
             result = scaler.inverse_transform(y_n)
             df_result = df.append({'Date':workdays.workday(datetime_input,days=1,holidays=holidays),'Close':float(result)}, ignore_index=True)
             test_result =test.append({'Date':workdays.workday(datetime_input,days=1,holidays=holidays),'Close':float(result)}, ignore_index=True)
+            
+            testdata_result = net(test_x)
+            testdata_n = testdata_result.to('cpu').detach().numpy().copy()
+            result_test = scaler.inverse_transform(testdata_n)
 
+            # データ数合わせ
+            for i in range(20):
+                result_test = np.insert(result_test,0,[None],axis=0)
+            result_test = np.insert(result_test,len(result_test),[None],)
+            
+            # 予測日によって動作変更
             if days_ahead == 1:
+                
+                test_result['Close_proba'] = result_test
+                
                 fig, ax = plt.subplots()
 
-                ax.plot(test_result['Date'],test_result['Close'])
+                ax.plot(test_result['Date'],test_result['Close'],label = '終値_テストデータ')
+                ax.plot(test_result['Date'],test_result['Close_proba'],linestyle="dashed",color = "crimson",label = '終値_テストデータ予測値')
                 ax.set_title(code_name, fontname="MS Gothic")
+                ax.legend()
 
                 st.pyplot(fig)
 
@@ -259,7 +274,6 @@ else:
 
 
                 st.markdown('<p class="font">' + code_name+ 'の' +str(date_result.iloc[-1].date()) + 'の終値の予測値は' + str(int(close_result.iloc[-1])) + '円です。' + '</p>', unsafe_allow_html=True)
-
             else:
                 d_count = 1
                 proba_close_re = proba_close
@@ -279,11 +293,17 @@ else:
                     y_n = y.to('cpu').detach().numpy().copy()
                     result = scaler.inverse_transform(y_n)
                     test_result =test_result.append({'Date':workdays.workday(datetime_input,days=d_count+1,holidays=holidays),'Close':float(result[-1])}, ignore_index=True)
+                    result_test = np.insert(result_test,len(result_test),[None],)
                     d_count += 1
+                    
+                test_result['Close_proba'] = result_test
+                    
                 fig, ax = plt.subplots()
 
-                ax.plot(test_result['Date'],test_result['Close'])
-                ax.set_title(code_name)
+                ax.plot(test_result['Date'],test_result['Close'],label = '終値_テストデータ')
+                ax.plot(test_result['Date'],test_result['Close_proba'],linestyle="dashed",color = "crimson",label = '終値_テストデータ予測値')
+                ax.set_title(code_name, fontname="MS Gothic")
+                ax.legend()
 
                 st.pyplot(fig)
 
